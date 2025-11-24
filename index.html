@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>下载APP</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .app-image {
+      width: 100%;
+      max-width: 280px;
+      height: auto;
+      margin: 20px auto;
+      display: block;
+      border-radius: 10px;
+    }
+
+    .description {
+      font-size: 16px;
+      color: #555;
+      margin: 20px 0;
+      padding: 0 15px;
+    }
+
+    .download-btn {
+      display: inline-block;
+      margin: 30px 0;
+      padding: 14px 40px;
+      background-color: #007bff;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 50px;
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .download-btn:hover {
+      background-color: #0056b3;
+      transform: translateY(-2px);
+    }
+
+    /* 弹窗样式 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 300px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .modal-message {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .copy-link {
+      display: block;
+      word-break: break-all;
+      background: #f0f0f0;
+      padding: 8px;
+      margin: 10px 0;
+      font-size: 14px;
+      color: #333;
+      border-radius: 4px;
+    }
+
+    .modal-btn {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 0 5px;
+    }
+
+    .modal-btn.close {
+      background-color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- APP 图片 -->
+    <img src="uploads/file/cnapk/img/ic_smart_obd.png" alt="APP Logo" class="app-image" />
+
+    <!-- 文字说明 -->
+    <p class="description">
+      SmartOBD是一款提供车辆诊断和驾驶风格服务的智能车辆管理手机应用程序，欢迎下载体验。
+    </p>
+
+    <!-- 下载按钮 -->
+    <a href="#" class="download-btn" id="downloadBtn">下 载</a>
+  </div>
+
+  <!-- iOS 提示弹窗 -->
+  <div class="modal" id="iosModal">
+    <div class="modal-content">
+      <div class="modal-title">请前往 App Store 下载</div>
+      <div class="modal-message">
+        您正在使用苹果设备，请打开 App Store 搜索应用名称进行下载。
+      </div>
+      <button class="modal-btn" onclick="closeModal()">确定</button>
+    </div>
+  </div>
+
+  <!-- 微信/QQ 浏览器提示弹窗 -->
+  <div class="modal" id="weixinQqModal">
+    <div class="modal-content">
+      <div class="modal-title">无法直接下载</div>
+      <div class="modal-message">
+        当前浏览器不支持下载，请复制以下链接，在手机自带浏览器中打开下载。
+      </div>
+      <div class="copy-link" id="downloadLink">https://www.humzor.com/uploads/file/cnapk/SmartOBD.apk</div>
+      <button class="modal-btn" onclick="copyLink()">复制链接</button>
+      <button class="modal-btn close" onclick="closeWeixinQqModal()">关闭</button>
+    </div>
+  </div>
+
+  <script>
+    const downloadBtn = document.getElementById('downloadBtn');
+    const iosModal = document.getElementById('iosModal');
+    const weixinQqModal = document.getElementById('weixinQqModal');
+    const downloadLink = document.getElementById('downloadLink');
+
+    // 判断是否为 iOS 设备
+    function isIOS() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      return /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    }
+
+    // 判断是否为微信或 QQ 浏览器
+    function isWechatOrQQ() {
+      const ua = navigator.userAgent.toLowerCase();
+      return /micromessenger/.test(ua) || /qq\//.test(ua);
+    }
+
+    // 复制链接到剪贴板
+    function copyLink() {
+      const text = downloadLink.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('链接已复制，快去浏览器粘贴吧！');
+      }).catch(err => {
+        console.error('复制失败: ', err);
+        alert('复制失败，请手动长按复制');
+      });
+    }
+
+    // 打开弹窗
+    function openIosModal() {
+      iosModal.style.display = 'flex';
+    }
+
+    function openWeixinQqModal() {
+      weixinQqModal.style.display = 'flex';
+    }
+
+    function closeWeixinQqModal() {
+      weixinQqModal.style.display = 'none';
+    }
+	
+	 function closeModal() {
+      iosModal.style.display = 'none';
+    }
+	
+    downloadBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      if (isIOS()) {
+        // iOS 设备
+        openIosModal();
+      } else if (isWechatOrQQ()) {
+        // 在微信或 QQ 中
+        openWeixinQqModal();
+      } else {
+        // 其他安卓浏览器，直接下载
+        window.location.href = 'uploads/file/cnapk/SmartOBD.apk'; // 替换为你的 APK 链接
+      }
+    });
+  </script>
+
+</body>
+</html>
+ 
